@@ -4,14 +4,14 @@ import com.baidu.fsg.uid.impl.CachedUidGenerator;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -20,8 +20,21 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * @author yutianbao
  */
-@SpringJUnitConfig(locations = { "classpath:uid/cached-uid-spring.xml" })
+@ExtendWith(SpringExtension.class) // 整合Spring与JUnit5
+@ContextConfiguration(locations = "classpath:uid/cached-uid-spring.xml")
+//@SpringJUnitConfig(locations = { "classpath:uid/cached-uid-spring.xml" })
 public class CachedUidGeneratorTest {
+
+    @Resource
+    private JdbcTemplate jdbcTemplate;
+
+    @Test
+    public void testDbConnection() {
+        String sql = "SELECT version() AS db_version";
+        Map<String, Object> resultMap = jdbcTemplate.queryForMap(sql);
+        System.out.println("PostgreSQL 数据库版本：" + resultMap.get("db_version"));
+    }
+
     private static final int SIZE = 7000000; // 700w
     private static final boolean VERBOSE = false;
     private static final int THREADS = Runtime.getRuntime().availableProcessors() << 1;

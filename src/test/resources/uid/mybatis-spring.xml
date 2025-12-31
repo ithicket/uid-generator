@@ -17,7 +17,7 @@
 	<bean id="configProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
 		<property name="locations">
 			<list>
-				<value>classpath:/uid/*.properties</value>
+				<value>classpath:/uid/pg.properties</value>
 			</list>
 		</property>
 	</bean>
@@ -47,8 +47,7 @@
 
 	<!-- 数据源配置 -->
 	<bean id="dataSource" parent="abstractDataSource">
-		<property name="driverClassName" value="${mysql.driver}" />
-		<property name="maxActive" value="${jdbc.maxActive}" />
+		<property name="driverClassName" value="${jdbc.driver}" />
 		<property name="url" value="${jdbc.url}" />
 		<property name="username" value="${jdbc.username}" />
 		<property name="password" value="${jdbc.password}" />
@@ -58,6 +57,7 @@
 		<property name="filters" value="${datasource.filters}" />
 		<property name="defaultAutoCommit" value="${datasource.defaultAutoCommit}" />
 		<property name="initialSize" value="${datasource.initialSize}" />
+		<property name="maxActive" value="${datasource.maxActive}" />
 		<property name="minIdle" value="${datasource.minIdle}" />
 		<property name="maxWait" value="${datasource.maxWait}" />
 		<property name="testWhileIdle" value="${datasource.testWhileIdle}" />
