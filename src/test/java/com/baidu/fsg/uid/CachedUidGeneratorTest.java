@@ -1,12 +1,10 @@
 package com.baidu.fsg.uid;
 
 import com.baidu.fsg.uid.impl.CachedUidGenerator;
-import org.apache.commons.lang.StringUtils;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import javax.annotation.Resource;
 import java.io.IOException;
@@ -19,11 +17,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Test for {@link CachedUidGenerator}
- * 
+ *
  * @author yutianbao
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "classpath:uid/cached-uid-spring.xml" })
+@SpringJUnitConfig(locations = { "classpath:uid/cached-uid-spring.xml" })
 public class CachedUidGeneratorTest {
     private static final int SIZE = 7000000; // 700w
     private static final boolean VERBOSE = false;
@@ -34,7 +31,7 @@ public class CachedUidGeneratorTest {
 
     /**
      * Test for serially generate
-     * 
+     *
      * @throws IOException
      */
     @Test
@@ -51,7 +48,7 @@ public class CachedUidGeneratorTest {
 
     /**
      * Test for parallel generate
-     * 
+     *
      * @throws InterruptedException
      * @throws IOException
      */
@@ -76,7 +73,7 @@ public class CachedUidGeneratorTest {
         }
 
         // Check generate 700w times
-        Assert.assertEquals(SIZE, control.get());
+        Assertions.assertEquals(SIZE, control.get());
 
         // Check UIDs are all unique
         checkUniqueID(uidSet);
@@ -108,8 +105,8 @@ public class CachedUidGeneratorTest {
         }
 
         // Check UID is positive, and can be parsed
-        Assert.assertTrue(uid > 0L);
-        Assert.assertTrue(StringUtils.isNotBlank(parsedInfo));
+        Assertions.assertTrue(uid > 0L);
+        Assertions.assertTrue(StringUtils.isNotBlank(parsedInfo));
 
         if (VERBOSE) {
             System.out.println(Thread.currentThread().getName() + " No." + index + " >>> " + parsedInfo);
@@ -121,7 +118,7 @@ public class CachedUidGeneratorTest {
      */
     private void checkUniqueID(Set<Long> uidSet) throws IOException {
         System.out.println(uidSet.size());
-        Assert.assertEquals(SIZE, uidSet.size());
+        Assertions.assertEquals(SIZE, uidSet.size());
     }
 
 }
