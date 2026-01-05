@@ -91,7 +91,7 @@
             <version>${slf4j-version}</version>
         </dependency>
 
-        <!-- JUnit5 核心 API（编写测试用例） -->
+        <!-- JUnit5 核心 API -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
@@ -99,7 +99,7 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- JUnit5 执行引擎（运行测试用例） -->
+        <!-- JUnit5 执行引擎 -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>

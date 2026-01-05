@@ -2,13 +2,13 @@
 # 部署postgresql
 ```shell
 docker run -d \
-  --name postgresql \
+  --name postgres \
   -e POSTGRES_USER=postgres \
   -e POSTGRES_PASSWORD=pg@2025 \
   -p 5432:5432 \
   postgres:latest
 
-docker exec -it pg-db psql -U postgres
+docker exec -it postgres psql -U postgres
 
 -- 1. 创建用户（设置密码，示例：username = myuser, password = mypassword）
 CREATE USER myuser WITH PASSWORD 'mypassword';
@@ -39,8 +39,8 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA myschema GRANT ALL ON TABLES TO myuser;
 
 
 ```sql
-DROP TABLE IF EXISTS myschema.worker_node;
-CREATE TABLE myschema.worker_node (
+DROP TABLE IF EXISTS worker_node;
+CREATE TABLE worker_node (
      id BIGSERIAL PRIMARY KEY,
      host_name VARCHAR(64) NOT NULL,
      port VARCHAR(64) NOT NULL,
@@ -50,12 +50,12 @@ CREATE TABLE myschema.worker_node (
      created TIMESTAMPTZ NOT NULL
 );
 
-COMMENT ON TABLE myschema.worker_node IS 'DB WorkerID Assigner for UID Generator';
-COMMENT ON COLUMN myschema.worker_node.id IS 'auto increment id';
-COMMENT ON COLUMN myschema.worker_node.host_name IS 'host name';
-COMMENT ON COLUMN myschema.worker_node.port IS 'port';
-COMMENT ON COLUMN myschema.worker_node.type IS 'node type: ACTUAL or CONTAINER';
-COMMENT ON COLUMN myschema.worker_node.launch_date IS 'launch date';
-COMMENT ON COLUMN myschema.worker_node.modified IS 'modified time';
-COMMENT ON COLUMN myschema.worker_node.created IS 'created time';
+COMMENT ON TABLE worker_node IS 'DB WorkerID Assigner for UID Generator';
+COMMENT ON COLUMN worker_node.id IS 'auto increment id';
+COMMENT ON COLUMN worker_node.host_name IS 'host name';
+COMMENT ON COLUMN worker_node.port IS 'port';
+COMMENT ON COLUMN worker_node.type IS 'node type: ACTUAL or CONTAINER';
+COMMENT ON COLUMN worker_node.launch_date IS 'launch date';
+COMMENT ON COLUMN worker_node.modified IS 'modified time';
+COMMENT ON COLUMN worker_node.created IS 'created time';
 ```

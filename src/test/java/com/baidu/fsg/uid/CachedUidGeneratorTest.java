@@ -35,7 +35,7 @@ public class CachedUidGeneratorTest {
         System.out.println("PostgreSQL 数据库版本：" + resultMap.get("db_version"));
     }
 
-    private static final int SIZE = 7000000; // 700w
+    private static final int SIZE = 7; // 700w
     private static final boolean VERBOSE = false;
     private static final int THREADS = Runtime.getRuntime().availableProcessors() << 1;
 

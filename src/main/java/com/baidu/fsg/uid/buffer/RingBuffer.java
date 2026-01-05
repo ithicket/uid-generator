@@ -249,13 +249,10 @@ public class RingBuffer {
 
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("RingBuffer [bufferSize=").append(bufferSize)
-               .append(", tail=").append(tail)
-               .append(", cursor=").append(cursor)
-               .append(", paddingThreshold=").append(paddingThreshold).append("]");
-        
-        return builder.toString();
+        return "RingBuffer [bufferSize=" + bufferSize +
+                ", tail=" + tail +
+                ", cursor=" + cursor +
+                ", paddingThreshold=" + paddingThreshold + "]";
     }
 
 }

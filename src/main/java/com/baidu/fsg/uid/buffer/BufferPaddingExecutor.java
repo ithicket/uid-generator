@@ -36,7 +36,7 @@ import com.baidu.fsg.uid.utils.PaddedAtomicLong;
  * @author yutianbao
  */
 public class BufferPaddingExecutor {
-    private static final Logger LOGGER = LoggerFactory.getLogger(RingBuffer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BufferPaddingExecutor.class);
 
     /** Constants */
     private static final String WORKER_NAME = "RingBuffer-Padding-Worker";
@@ -101,7 +101,7 @@ public class BufferPaddingExecutor {
      */
     public void start() {
         if (bufferPadSchedule != null) {
-            bufferPadSchedule.scheduleWithFixedDelay(() -> paddingBuffer(), scheduleInterval, scheduleInterval, TimeUnit.SECONDS);
+            bufferPadSchedule.scheduleWithFixedDelay(this::paddingBuffer, scheduleInterval, scheduleInterval, TimeUnit.SECONDS);
         }
     }
 
