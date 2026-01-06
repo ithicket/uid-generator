@@ -13,20 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baidu.fsg.uid.worker;
+package com.baidu.fsg.uid.mapper;
+
+import com.baidu.fsg.uid.domain.WorkerNodeEntity;
+import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
 
 /**
- * Represents a worker id assigner for {@link com.baidu.fsg.uid.impl.DefaultUidGenerator}
- * 
+ * DAO for M_WORKER_NODE
+ *
  * @author yutianbao
  */
-public interface WorkerIdAssigner {
+@Repository
+public interface WorkerNodeMapper {
 
     /**
-     * Assign worker id for {@link com.baidu.fsg.uid.impl.DefaultUidGenerator}
+     * Get {@link WorkerNodeEntity} by node host
      * 
-     * @return assigned worker id
+     * @param host
+     * @param port
+     * @return
      */
-    long assignWorkerId();
+    WorkerNodeEntity getWorkerNodeByHostPort(@Param("host") String host, @Param("port") String port);
+
+    /**
+     * Add {@link WorkerNodeEntity}
+     * 
+     * @param workerNodeEntity
+     */
+    void addWorkerNode(WorkerNodeEntity workerNodeEntity);
 
 }

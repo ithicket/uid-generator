@@ -13,21 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baidu.fsg.uid.worker;
+package com.baidu.fsg.uid.service.impl;
 
+import com.baidu.fsg.uid.enums.WorkerNodeType;
+import com.baidu.fsg.uid.service.WorkerIdAssigner;
 import com.baidu.fsg.uid.utils.DockerUtils;
 import com.baidu.fsg.uid.utils.NetUtils;
-import com.baidu.fsg.uid.worker.dao.WorkerNodeDAO;
-import com.baidu.fsg.uid.worker.entity.WorkerNodeEntity;
+import com.baidu.fsg.uid.mapper.WorkerNodeMapper;
+import com.baidu.fsg.uid.domain.WorkerNodeEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
- * Represents an implementation of {@link WorkerIdAssigner}, 
+ * Represents an implementation of {@link WorkerIdAssigner},
  * the worker id will be discarded after assigned to the UidGenerator
  * 
  * @author yutianbao
@@ -35,8 +36,11 @@ import java.util.concurrent.ThreadLocalRandom;
 public class DisposableWorkerIdAssigner implements WorkerIdAssigner {
     private static final Logger LOGGER = LoggerFactory.getLogger(DisposableWorkerIdAssigner.class);
 
-    @Resource
-    private WorkerNodeDAO workerNodeDAO;
+    private final WorkerNodeMapper workerNodeMapper;
+
+    public DisposableWorkerIdAssigner(WorkerNodeMapper workerNodeMapper) {
+        this.workerNodeMapper = workerNodeMapper;
+    }
 
     /**
      * Assign worker id base on database.<p>
@@ -51,8 +55,8 @@ public class DisposableWorkerIdAssigner implements WorkerIdAssigner {
         WorkerNodeEntity workerNodeEntity = buildWorkerNode();
 
         // add worker node for new (ignore the same IP + PORT)
-        workerNodeDAO.addWorkerNode(workerNodeEntity);
-        LOGGER.info("Add worker node:" + workerNodeEntity);
+        workerNodeMapper.addWorkerNode(workerNodeEntity);
+        LOGGER.info("Add worker node:{}", workerNodeEntity);
 
         return workerNodeEntity.getId();
     }

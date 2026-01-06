@@ -37,7 +37,7 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA myschema GRANT ALL ON TABLES TO myuser;
 ```
 
 
-
+# 创建表
 ```sql
 DROP TABLE IF EXISTS worker_node;
 CREATE TABLE worker_node (
@@ -59,3 +59,103 @@ COMMENT ON COLUMN worker_node.launch_date IS 'launch date';
 COMMENT ON COLUMN worker_node.modified IS 'modified time';
 COMMENT ON COLUMN worker_node.created IS 'created time';
 ```
+
+# SpringBoot 集成
+
+1、依赖
+```xml
+<dependency>
+    <groupId>com.baidu.fsg</groupId>
+    <artifactId>uid-generator</artifactId>
+    <version>1.0.17</version>
+</dependency>
+```
+
+2、添加扫描
+```java
+@MapperScan(basePackages = "com.baidu.fsg.uid.mapper")
+@SpringBootApplication
+public class Application {
+
+}
+```
+
+```yml
+mybatis-plus:
+  # 扫描Mapper接口（指定JAR中的Mapper包路径，多个包用逗号分隔）
+  type-aliases-package: com.baidu.fsg.uid.domain
+  # 扫描XML映射文件（关键：用classpath*: 代替 classpath:，支持扫描所有类路径（包括外部JAR））
+  mapper-locations:
+    - classpath:mapper/*.xml                          # 当前项目的XML文件
+    - classpath*:/META-INF/mybatis/mapper/*.xml       # JAR中的XML文件
+```
+
+3、配置类
+```java
+package com.demo.common.config;
+
+
+import com.baidu.fsg.uid.generator.CachedUidGenerator;
+import com.baidu.fsg.uid.mapper.WorkerNodeMapper;
+import com.baidu.fsg.uid.service.impl.DisposableWorkerIdAssigner;
+import jakarta.annotation.Resource;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class UidGeneratorConfig {
+
+    @Resource
+    private WorkerNodeMapper workerNodeMapper;
+
+    @Bean
+    public DisposableWorkerIdAssigner disposableWorkerIdAssigner() {
+        return new DisposableWorkerIdAssigner(workerNodeMapper);
+    }
+
+    @Bean
+    public CachedUidGenerator cachedUidGenerator(DisposableWorkerIdAssigner disposableWorkerIdAssigner) {
+        CachedUidGenerator generator = new CachedUidGenerator();
+        generator.setWorkerIdAssigner(disposableWorkerIdAssigner);
+
+        // 时间位配置
+        generator.setTimeBits(30);
+        generator.setWorkerBits(22);
+        generator.setSeqBits(11);
+        generator.setEpochStr("2026-01-01");
+
+        // 缓存配置
+        generator.setBoostPower(3);
+        generator.setScheduleInterval(60L);
+
+        return generator;
+    }
+
+}
+```
+
+4、使用
+```java
+package com.demo.controller;
+
+import com.baidu.fsg.uid.generator.UidGenerator;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RequiredArgsConstructor
+@RestController
+@RequestMapping("/system/uid")
+public class UidController {
+
+    private final UidGenerator cachedUidGenerator;
+
+    @GetMapping("/generateUid")
+    public long generateUid() {
+        return cachedUidGenerator.getUID();
+    }
+
+}
+```
+

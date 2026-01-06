@@ -1,16 +1,13 @@
 package com.baidu.fsg.uid;
 
-import com.baidu.fsg.uid.impl.CachedUidGenerator;
+import com.baidu.fsg.uid.generator.CachedUidGenerator;
+import com.baidu.fsg.uid.generator.UidGenerator;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-import javax.annotation.Resource;
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -20,35 +17,22 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * @author yutianbao
  */
-@ExtendWith(SpringExtension.class) // 整合Spring与JUnit5
-@ContextConfiguration(locations = "classpath:uid/cached-uid-spring.xml")
-//@SpringJUnitConfig(locations = { "classpath:uid/cached-uid-spring.xml" })
+@SpringJUnitConfig(locations = { "classpath:uid/cached-uid-spring.xml" })
 public class CachedUidGeneratorTest {
 
-    @Resource
-    private JdbcTemplate jdbcTemplate;
-
-    @Test
-    public void testDbConnection() {
-        String sql = "SELECT version() AS db_version";
-        Map<String, Object> resultMap = jdbcTemplate.queryForMap(sql);
-        System.out.println("PostgreSQL 数据库版本：" + resultMap.get("db_version"));
-    }
+    @Autowired
+    private UidGenerator uidGenerator;
 
     private static final int SIZE = 7; // 700w
     private static final boolean VERBOSE = false;
     private static final int THREADS = Runtime.getRuntime().availableProcessors() << 1;
 
-    @Resource
-    private UidGenerator uidGenerator;
 
     /**
      * Test for serially generate
-     *
-     * @throws IOException
      */
     @Test
-    public void testSerialGenerate() throws IOException {
+    public void testSerialGenerate() {
         // Generate UID serially
         Set<Long> uidSet = new HashSet<>(SIZE);
         for (int i = 0; i < SIZE; i++) {
@@ -61,12 +45,9 @@ public class CachedUidGeneratorTest {
 
     /**
      * Test for parallel generate
-     *
-     * @throws InterruptedException
-     * @throws IOException
      */
     @Test
-    public void testParallelGenerate() throws InterruptedException, IOException {
+    public void testParallelGenerate() throws InterruptedException {
         AtomicInteger control = new AtomicInteger(-1);
         Set<Long> uidSet = new ConcurrentSkipListSet<>();
 
@@ -93,7 +74,7 @@ public class CachedUidGeneratorTest {
     }
 
     /**
-     * Woker run
+     * Worker run
      */
     private void workerRun(Set<Long> uidSet, AtomicInteger control) {
         for (;;) {
@@ -107,10 +88,11 @@ public class CachedUidGeneratorTest {
     }
 
     /**
-     * Do generating
+     * Do generate
      */
     private void doGenerate(Set<Long> uidSet, int index) {
         long uid = uidGenerator.getUID();
+        System.out.println("UID:" + uid);
         String parsedInfo = uidGenerator.parseUID(uid);
         boolean existed = !uidSet.add(uid);
         if (existed) {
@@ -129,7 +111,7 @@ public class CachedUidGeneratorTest {
     /**
      * Check UIDs are all unique
      */
-    private void checkUniqueID(Set<Long> uidSet) throws IOException {
+    private void checkUniqueID(Set<Long> uidSet) {
         System.out.println(uidSet.size());
         Assertions.assertEquals(SIZE, uidSet.size());
     }

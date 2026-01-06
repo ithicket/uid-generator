@@ -13,36 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baidu.fsg.uid.worker;
+package com.baidu.fsg.uid.generator;
 
-import com.baidu.fsg.uid.utils.ValuedEnum;
+import com.baidu.fsg.uid.exception.UidGenerateException;
 
 /**
- * WorkerNodeType
- * <li>CONTAINER: Such as Docker
- * <li>ACTUAL: Actual machine
- * 
+ * Represents a unique id generator.
+ *
  * @author yutianbao
  */
-public enum WorkerNodeType implements ValuedEnum<Integer> {
-
-    CONTAINER(1), ACTUAL(2);
+public interface UidGenerator {
 
     /**
-     * Lock type
+     * Get a unique ID
+     *
+     * @return UID
+     * @throws UidGenerateException
      */
-    private final Integer type;
+    long getUID() throws UidGenerateException;
 
     /**
-     * Constructor with field of type
+     * Parse the UID into elements which are used to generate the UID. <br>
+     * Such as timestamp & workerId & sequence...
+     *
+     * @param uid
+     * @return Parsed info
      */
-    private WorkerNodeType(Integer type) {
-        this.type = type;
-    }
-
-    @Override
-    public Integer value() {
-        return type;
-    }
+    String parseUID(long uid);
 
 }

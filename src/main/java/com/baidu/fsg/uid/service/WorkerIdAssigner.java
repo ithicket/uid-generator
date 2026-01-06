@@ -13,32 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baidu.fsg.uid;
+package com.baidu.fsg.uid.service;
 
-import com.baidu.fsg.uid.exception.UidGenerateException;
+import com.baidu.fsg.uid.generator.DefaultUidGenerator;
 
 /**
- * Represents a unique id generator.
+ * Represents a worker id assigner for {@link DefaultUidGenerator}
  *
  * @author yutianbao
  */
-public interface UidGenerator {
+public interface WorkerIdAssigner {
 
     /**
-     * Get a unique ID
+     * Assign worker id for {@link DefaultUidGenerator}
      *
-     * @return UID
-     * @throws UidGenerateException
+     * @return assigned worker id
      */
-    long getUID() throws UidGenerateException;
-
-    /**
-     * Parse the UID into elements which are used to generate the UID. <br>
-     * Such as timestamp & workerId & sequence...
-     *
-     * @param uid
-     * @return Parsed info
-     */
-    String parseUID(long uid);
+    long assignWorkerId();
 
 }

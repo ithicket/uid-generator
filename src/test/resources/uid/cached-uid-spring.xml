@@ -4,9 +4,9 @@
 	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
 
 	<!-- UID generator -->
-	<bean id="disposableWorkerIdAssigner" class="com.baidu.fsg.uid.worker.DisposableWorkerIdAssigner" />
+	<bean id="disposableWorkerIdAssigner" class="com.baidu.fsg.uid.service.impl.DisposableWorkerIdAssigner" />
 
-	<bean id="cachedUidGenerator" class="com.baidu.fsg.uid.impl.CachedUidGenerator">
+	<bean id="cachedUidGenerator" class="com.baidu.fsg.uid.generator.CachedUidGenerator">
 		<property name="workerIdAssigner" ref="disposableWorkerIdAssigner" />
 
 		<property name="epochStr" value="2025-01-01"/>

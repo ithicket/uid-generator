@@ -13,34 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baidu.fsg.uid.worker.dao;
+package com.baidu.fsg.uid.enums;
 
-import com.baidu.fsg.uid.worker.entity.WorkerNodeEntity;
-import org.apache.ibatis.annotations.Param;
-import org.springframework.stereotype.Repository;
+import com.baidu.fsg.uid.utils.ValuedEnum;
 
 /**
- * DAO for M_WORKER_NODE
- *
+ * WorkerNodeType
+ * <li>CONTAINER: Such as Docker
+ * <li>ACTUAL: Actual machine
+ * 
  * @author yutianbao
  */
-@Repository
-public interface WorkerNodeDAO {
+public enum WorkerNodeType implements ValuedEnum<Integer> {
+
+    CONTAINER(1), ACTUAL(2);
 
     /**
-     * Get {@link WorkerNodeEntity} by node host
-     * 
-     * @param host
-     * @param port
-     * @return
+     * Lock type
      */
-    WorkerNodeEntity getWorkerNodeByHostPort(@Param("host") String host, @Param("port") String port);
+    private final Integer type;
 
     /**
-     * Add {@link WorkerNodeEntity}
-     * 
-     * @param workerNodeEntity
+     * Constructor with field of type
      */
-    void addWorkerNode(WorkerNodeEntity workerNodeEntity);
+    private WorkerNodeType(Integer type) {
+        this.type = type;
+    }
+
+    @Override
+    public Integer value() {
+        return type;
+    }
 
 }
