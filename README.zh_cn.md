@@ -104,66 +104,68 @@ PRIMARY KEY(ID)
 修改[mysql.properties](src/test/resources/uid/mysql.properties)配置中, jdbc.url, jdbc.username和jdbc.password, 确保库地址, 名称, 端口号, 用户名和密码正确.
 
 ### 步骤3: 修改Spring配置
-提供了两种生成器: [DefaultUidGenerator](src/main/java/com/baidu/fsg/uid/impl/DefaultUidGenerator.java)、[CachedUidGenerator](src/main/java/com/baidu/fsg/uid/impl/CachedUidGenerator.java)。如对UID生成性能有要求, 请使用CachedUidGenerator<br/>
+提供了两种生成器: [DefaultUidGenerator](src/main/java/com/baidu/fsg/uid/generator/DefaultUidGenerator.java)、[CachedUidGenerator](src/main/java/com/baidu/fsg/uid/generator/CachedUidGenerator.java)。如对UID生成性能有要求, 请使用CachedUidGenerator<br/>
 对应Spring配置分别为: [default-uid-spring.xml](src/test/resources/uid/default-uid-spring.xml)、[cached-uid-spring.xml](src/test/resources/uid/cached-uid-spring.xml)
 
 #### DefaultUidGenerator配置
+
 ```xml
 <!-- DefaultUidGenerator -->
-<bean id="defaultUidGenerator" class="com.baidu.fsg.uid.impl.DefaultUidGenerator" lazy-init="false">
-    <property name="workerIdAssigner" ref="disposableWorkerIdAssigner"/>
+<bean id="defaultUidGenerator" class="com.baidu.fsg.uid.generator.DefaultUidGenerator" lazy-init="false">
+  <property name="workerIdAssigner" ref="disposableWorkerIdAssigner"/>
 
-    <!-- Specified bits & epoch as your demand. No specified the default value will be used -->
-    <property name="timeBits" value="29"/>
-    <property name="workerBits" value="21"/>
-    <property name="seqBits" value="13"/>
-    <property name="epochStr" value="2016-09-20"/>
+  <!-- Specified bits & epoch as your demand. No specified the default value will be used -->
+  <property name="timeBits" value="29"/>
+  <property name="workerBits" value="21"/>
+  <property name="seqBits" value="13"/>
+  <property name="epochStr" value="2016-09-20"/>
 </bean>
- 
-<!-- 用完即弃的WorkerIdAssigner，依赖DB操作 -->
-<bean id="disposableWorkerIdAssigner" class="com.baidu.fsg.uid.worker.DisposableWorkerIdAssigner" />
+
+        <!-- 用完即弃的WorkerIdAssigner，依赖DB操作 -->
+<bean id="disposableWorkerIdAssigner" class="com.baidu.fsg.uid.service.impl.DisposableWorkerIdAssigner"/>
 
 ```
 
 #### CachedUidGenerator配置
+
 ```xml
 <!-- CachedUidGenerator -->
-<bean id="cachedUidGenerator" class="com.baidu.fsg.uid.impl.CachedUidGenerator">
-    <property name="workerIdAssigner" ref="disposableWorkerIdAssigner" />
- 
-    <!-- 以下为可选配置, 如未指定将采用默认值 -->
-    <!-- Specified bits & epoch as your demand. No specified the default value will be used -->
-    <property name="timeBits" value="29"/>
-    <property name="workerBits" value="21"/>
-    <property name="seqBits" value="13"/>
-    <property name="epochStr" value="2016-09-20"/>
- 
-    <!-- RingBuffer size扩容参数, 可提高UID生成的吞吐量. -->
-    <!-- 默认:3， 原bufferSize=8192, 扩容后bufferSize= 8192 << 3 = 65536 -->
-    <property name="boostPower" value="3"></property>
- 
-    <!-- 指定何时向RingBuffer中填充UID, 取值为百分比(0, 100), 默认为50 -->
-    <!-- 举例: bufferSize=1024, paddingFactor=50 -> threshold=1024 * 50 / 100 = 512. -->
-    <!-- 当环上可用UID数量 < 512时, 将自动对RingBuffer进行填充补全 -->
-    <property name="paddingFactor" value="50"></property>
- 
-    <!-- 另外一种RingBuffer填充时机, 在Schedule线程中, 周期性检查填充 -->
-    <!-- 默认:不配置此项, 即不实用Schedule线程. 如需使用, 请指定Schedule线程时间间隔, 单位:秒 -->
-    <property name="scheduleInterval" value="60"></property>
- 
-    <!-- 拒绝策略: 当环已满, 无法继续填充时 -->
-    <!-- 默认无需指定, 将丢弃Put操作, 仅日志记录. 如有特殊需求, 请实现RejectedPutBufferHandler接口(支持Lambda表达式) -->
-    <property name="rejectedPutBufferHandler" ref="XxxxYourPutRejectPolicy"></property>
- 
-    <!-- 拒绝策略: 当环已空, 无法继续获取时 -->
-    <!-- 默认无需指定, 将记录日志, 并抛出UidGenerateException异常. 如有特殊需求, 请实现RejectedTakeBufferHandler接口(支持Lambda表达式) -->
-    <property name="rejectedTakeBufferHandler" ref="XxxxYourTakeRejectPolicy"></property>
- 
+<bean id="cachedUidGenerator" class="com.baidu.fsg.uid.generator.CachedUidGenerator">
+  <property name="workerIdAssigner" ref="disposableWorkerIdAssigner"/>
+
+  <!-- 以下为可选配置, 如未指定将采用默认值 -->
+  <!-- Specified bits & epoch as your demand. No specified the default value will be used -->
+  <property name="timeBits" value="29"/>
+  <property name="workerBits" value="21"/>
+  <property name="seqBits" value="13"/>
+  <property name="epochStr" value="2016-09-20"/>
+
+  <!-- RingBuffer size扩容参数, 可提高UID生成的吞吐量. -->
+  <!-- 默认:3， 原bufferSize=8192, 扩容后bufferSize= 8192 << 3 = 65536 -->
+  <property name="boostPower" value="3"></property>
+
+  <!-- 指定何时向RingBuffer中填充UID, 取值为百分比(0, 100), 默认为50 -->
+  <!-- 举例: bufferSize=1024, paddingFactor=50 -> threshold=1024 * 50 / 100 = 512. -->
+  <!-- 当环上可用UID数量 < 512时, 将自动对RingBuffer进行填充补全 -->
+  <property name="paddingFactor" value="50"></property>
+
+  <!-- 另外一种RingBuffer填充时机, 在Schedule线程中, 周期性检查填充 -->
+  <!-- 默认:不配置此项, 即不实用Schedule线程. 如需使用, 请指定Schedule线程时间间隔, 单位:秒 -->
+  <property name="scheduleInterval" value="60"></property>
+
+  <!-- 拒绝策略: 当环已满, 无法继续填充时 -->
+  <!-- 默认无需指定, 将丢弃Put操作, 仅日志记录. 如有特殊需求, 请实现RejectedPutBufferHandler接口(支持Lambda表达式) -->
+  <property name="rejectedPutBufferHandler" ref="XxxxYourPutRejectPolicy"></property>
+
+  <!-- 拒绝策略: 当环已空, 无法继续获取时 -->
+  <!-- 默认无需指定, 将记录日志, 并抛出UidGenerateException异常. 如有特殊需求, 请实现RejectedTakeBufferHandler接口(支持Lambda表达式) -->
+  <property name="rejectedTakeBufferHandler" ref="XxxxYourTakeRejectPolicy"></property>
+
 </bean>
- 
-<!-- 用完即弃的WorkerIdAssigner, 依赖DB操作 -->
-<bean id="disposableWorkerIdAssigner" class="com.baidu.fsg.uid.worker.DisposableWorkerIdAssigner" />
- 
+
+        <!-- 用完即弃的WorkerIdAssigner, 依赖DB操作 -->
+<bean id="disposableWorkerIdAssigner" class="com.baidu.fsg.uid.service.impl.DisposableWorkerIdAssigner"/>
+
 ```
 
 #### Mybatis配置
@@ -171,56 +173,56 @@ PRIMARY KEY(ID)
 
 ```xml
 <!-- Spring annotation扫描 -->
-<context:component-scan base-package="com.baidu.fsg.uid" />
+<context:component-scan base-package="com.baidu.fsg.uid"/>
 
 <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
-    <property name="dataSource" ref="dataSource" />
-    <property name="mapperLocations" value="classpath:/META-INF/mybatis/mapper/M_WORKER*.xml" />
+<property name="dataSource" ref="dataSource"/>
+<property name="mapperLocations" value="classpath:/META-INF/mybatis/mapper/M_WORKER*.xml"/>
 </bean>
 
-<!-- 事务相关配置 -->
-<tx:annotation-driven transaction-manager="transactionManager" order="1" />
+        <!-- 事务相关配置 -->
+<tx:annotation-driven transaction-manager="transactionManager" order="1"/>
 
 <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-	<property name="dataSource" ref="dataSource" />
+<property name="dataSource" ref="dataSource"/>
 </bean>
 
-<!-- Mybatis Mapper扫描 -->
+        <!-- Mybatis Mapper扫描 -->
 <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
-	<property name="annotationClass" value="org.springframework.stereotype.Repository" />
-	<property name="basePackage" value="com.baidu.fsg.uid.worker.dao" />
-	<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
+<property name="annotationClass" value="org.springframework.stereotype.Repository"/>
+<property name="basePackage" value="com.baidu.fsg.uid.service.dao"/>
+<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
 </bean>
 
-<!-- 数据源配置 -->
+        <!-- 数据源配置 -->
 <bean id="dataSource" parent="abstractDataSource">
-	<property name="driverClassName" value="${mysql.driver}" />
-	<property name="maxActive" value="${jdbc.maxActive}" />
-	<property name="url" value="${jdbc.url}" />
-	<property name="username" value="${jdbc.username}" />
-	<property name="password" value="${jdbc.password}" />
+<property name="driverClassName" value="${mysql.driver}"/>
+<property name="maxActive" value="${jdbc.maxActive}"/>
+<property name="url" value="${jdbc.url}"/>
+<property name="username" value="${jdbc.username}"/>
+<property name="password" value="${jdbc.password}"/>
 </bean>
 
 <bean id="abstractDataSource" class="com.alibaba.druid.pool.DruidDataSource" destroy-method="close">
-	<property name="filters" value="${datasource.filters}" />
-	<property name="defaultAutoCommit" value="${datasource.defaultAutoCommit}" />
-	<property name="initialSize" value="${datasource.initialSize}" />
-	<property name="minIdle" value="${datasource.minIdle}" />
-	<property name="maxWait" value="${datasource.maxWait}" />
-	<property name="testWhileIdle" value="${datasource.testWhileIdle}" />
-	<property name="testOnBorrow" value="${datasource.testOnBorrow}" />
-	<property name="testOnReturn" value="${datasource.testOnReturn}" />
-	<property name="validationQuery" value="${datasource.validationQuery}" />
-	<property name="timeBetweenEvictionRunsMillis" value="${datasource.timeBetweenEvictionRunsMillis}" />
-	<property name="minEvictableIdleTimeMillis" value="${datasource.minEvictableIdleTimeMillis}" />
-	<property name="logAbandoned" value="${datasource.logAbandoned}" />
-	<property name="removeAbandoned" value="${datasource.removeAbandoned}" />
-	<property name="removeAbandonedTimeout" value="${datasource.removeAbandonedTimeout}" />
+<property name="filters" value="${datasource.filters}"/>
+<property name="defaultAutoCommit" value="${datasource.defaultAutoCommit}"/>
+<property name="initialSize" value="${datasource.initialSize}"/>
+<property name="minIdle" value="${datasource.minIdle}"/>
+<property name="maxWait" value="${datasource.maxWait}"/>
+<property name="testWhileIdle" value="${datasource.testWhileIdle}"/>
+<property name="testOnBorrow" value="${datasource.testOnBorrow}"/>
+<property name="testOnReturn" value="${datasource.testOnReturn}"/>
+<property name="validationQuery" value="${datasource.validationQuery}"/>
+<property name="timeBetweenEvictionRunsMillis" value="${datasource.timeBetweenEvictionRunsMillis}"/>
+<property name="minEvictableIdleTimeMillis" value="${datasource.minEvictableIdleTimeMillis}"/>
+<property name="logAbandoned" value="${datasource.logAbandoned}"/>
+<property name="removeAbandoned" value="${datasource.removeAbandoned}"/>
+<property name="removeAbandonedTimeout" value="${datasource.removeAbandonedTimeout}"/>
 </bean>
 
 <bean id="batchSqlSession" class="org.mybatis.spring.SqlSessionTemplate">
-	<constructor-arg index="0" ref="sqlSessionFactory" />
-	<constructor-arg index="1" value="BATCH" />
+<constructor-arg index="0" ref="sqlSessionFactory"/>
+<constructor-arg index="1" value="BATCH"/>
 </bean>
 ```
 

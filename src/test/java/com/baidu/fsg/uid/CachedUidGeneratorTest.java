@@ -1,6 +1,7 @@
 package com.baidu.fsg.uid;
 
-import com.baidu.fsg.uid.impl.CachedUidGenerator;
+import com.baidu.fsg.uid.generator.CachedUidGenerator;
+import com.baidu.fsg.uid.generator.UidGenerator;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -111,6 +112,7 @@ public class CachedUidGeneratorTest {
      */
     private void doGenerate(Set<Long> uidSet, int index) {
         long uid = uidGenerator.getUID();
+        System.out.println("UID:" + uid);
         String parsedInfo = uidGenerator.parseUID(uid);
         boolean existed = !uidSet.add(uid);
         if (existed) {

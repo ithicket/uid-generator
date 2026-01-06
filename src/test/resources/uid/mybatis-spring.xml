@@ -45,7 +45,7 @@
 	<!-- Mybatis Mapper扫描 -->
 	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
 		<property name="annotationClass" value="org.springframework.stereotype.Repository" />
-		<property name="basePackage" value="com.baidu.fsg.uid.worker.dao" />
+		<property name="basePackage" value="com.baidu.fsg.uid.mapper" />
 		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
 	</bean>
 

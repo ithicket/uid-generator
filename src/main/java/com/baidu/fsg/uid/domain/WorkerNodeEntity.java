@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baidu.fsg.uid.worker.entity;
+package com.baidu.fsg.uid.domain;
 
 import java.util.Date;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-import com.baidu.fsg.uid.worker.WorkerNodeType;
+import com.baidu.fsg.uid.enums.WorkerNodeType;
 
 /**
  * Entity for M_WORKER_NODE

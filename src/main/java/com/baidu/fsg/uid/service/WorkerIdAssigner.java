@@ -13,36 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baidu.fsg.uid.worker;
-
-import com.baidu.fsg.uid.utils.ValuedEnum;
+package com.baidu.fsg.uid.service;
 
 /**
- * WorkerNodeType
- * <li>CONTAINER: Such as Docker
- * <li>ACTUAL: Actual machine
+ * Represents a worker id assigner for {@link com.baidu.fsg.uid.generator.DefaultUidGenerator}
  * 
  * @author yutianbao
  */
-public enum WorkerNodeType implements ValuedEnum<Integer> {
-
-    CONTAINER(1), ACTUAL(2);
+public interface WorkerIdAssigner {
 
     /**
-     * Lock type
+     * Assign worker id for {@link com.baidu.fsg.uid.generator.DefaultUidGenerator}
+     * 
+     * @return assigned worker id
      */
-    private final Integer type;
-
-    /**
-     * Constructor with field of type
-     */
-    private WorkerNodeType(Integer type) {
-        this.type = type;
-    }
-
-    @Override
-    public Integer value() {
-        return type;
-    }
+    long assignWorkerId();
 
 }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baidu.fsg.uid.impl;
+package com.baidu.fsg.uid.generator;
 
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
@@ -23,11 +23,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 
-import com.baidu.fsg.uid.BitsAllocator;
-import com.baidu.fsg.uid.UidGenerator;
+import com.baidu.fsg.uid.domain.BitsAllocator;
 import com.baidu.fsg.uid.exception.UidGenerateException;
 import com.baidu.fsg.uid.utils.DateUtils;
-import com.baidu.fsg.uid.worker.WorkerIdAssigner;
+import com.baidu.fsg.uid.service.WorkerIdAssigner;
 
 /**
  * Represents an implementation of {@link UidGenerator}

@@ -4,9 +4,9 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
 
     <!-- UID generator -->
-    <bean id="disposableWorkerIdAssigner" class="com.baidu.fsg.uid.worker.DisposableWorkerIdAssigner"/>
+    <bean id="disposableWorkerIdAssigner" class="com.baidu.fsg.uid.service.impl.DisposableWorkerIdAssigner"/>
 
-    <bean id="defaultUidGenerator" class="com.baidu.fsg.uid.impl.DefaultUidGenerator" lazy-init="false">
+    <bean id="defaultUidGenerator" class="com.baidu.fsg.uid.generator.DefaultUidGenerator" lazy-init="false">
         <property name="workerIdAssigner" ref="disposableWorkerIdAssigner"/>
 
         <!-- Specified bits & epoch as your demand. No specified the default value will be used -->
